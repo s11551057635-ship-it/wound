@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surgical Site Infection Prevention - MC Quiz</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <header class="bg-sky-900 text-white shadow-md py-6 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Surgical Site Infection Prevention</h1>
+            <p class="text-sky-200 mt-1 text-sm md:text-base">Interactive 20-Question Knowledge Check based on Clinical Guidelines</p>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-3xl w-full mx-auto p-4 md:p-6 my-6">
+        
+        <!-- Welcome Screen -->
+        <div id="start-screen" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center">
+            <div class="w-16 h-16 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">🏥</div>
+            <h2 class="text-xl md:text-2xl font-semibold mb-2 text-slate-900">Ready to Test Your Knowledge?</h2>
+            <p class="text-slate-600 mb-6 max-w-lg mx-auto text-sm md:text-base">This quiz covers 4 major clinical domains: Patient Preparation, Operating Theatre Procedures, Post-Operative Care, and Continuous Surveillance.</p>
+            <button onclick="startQuiz()" class="bg-sky-600 hover:bg-sky-700 text-white font-medium px-8 py-3 rounded-xl shadow-md transition transform active:scale-95">
+                Start Quiz (20 Questions)
+            </button>
+        </div>
+
+        <!-- Quiz Container (Hidden initially) -->
+        <div id="quiz-container" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+            <!-- Progress Bar -->
+            <div class="flex justify-between items-center mb-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <span id="category-tag" class="bg-sky-100 text-sky-800 px-2.5 py-1 rounded-md">Category</span>
+                <span id="question-counter">Question 1 of 20</span>
+            </div>
+            <div class="w-full bg-slate-100 h-2 rounded-full mb-6 overflow-hidden">
+                <div id="progress-bar" class="bg-sky-600 h-full transition-all duration-300" style="width: 5%"></div>
+            </div>
+
+            <!-- Question Text -->
+            <h3 id="question-text" class="text-lg md:text-xl font-semibold text-slate-900 mb-6"></h3>
+
+            <!-- Options List -->
+            <div id="options-container" class="space-y-3 mb-6">
+                <!-- Dynamically injected option buttons -->
+            </div>
+
+            <!-- Explanation Box (Initially Hidden) -->
+            <div id="explanation-box" class="hidden bg-slate-50 border-l-4 border-sky-500 p-4 rounded-r-xl mb-6 text-sm text-slate-700">
+                <span class="font-semibold block mb-1">Clinical Insight:</span>
+                <p id="explanation-text"></p>
+            </div>
+
+            <!-- Navigation Footer -->
+            <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                <button id="prev-btn" onclick="prevQuestion()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 disabled:opacity-40 disabled:cursor-not-allowed">
+                    ← Previous
+                </button>
+                <button id="next-btn" onclick="nextQuestion()" class="bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium px-6 py-2.5 rounded-xl shadow transition hidden">
+                    Next Question →
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Screen (Hidden initially) -->
+        <div id="results-screen" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 text-center">
+            <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-bold">🏆</div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Quiz Completed!</h2>
+            <p class="text-slate-600 mb-6">Here is how you performed on the surgical site infection assessment:</p>
+            
+            <div class="inline-block bg-slate-50 border border-slate-200 rounded-2xl px-8 py-4 mb-6">
+                <span id="score-display" class="text-4xl font-extrabold text-sky-600">0/20</span>
+                <span class="block text-xs uppercase font-semibold text-slate-500 mt-1">Final Score</span>
+            </div>
+
+            <p id="score-message" class="text-slate-700 font-medium mb-8 max-w-md mx-auto"></p>
+
+            <div class="flex justify-center gap-4">
+                <button onclick="restartQuiz()" class="bg-sky-600 hover:bg-sky-700 text-white font-medium px-6 py-3 rounded-xl shadow transition">
+                    Retake Quiz
+                </button>
+                <button onclick="reviewAnswers()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-6 py-3 rounded-xl transition">
+                    Review Answers
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-center py-6 text-xs text-slate-400">
+        Clinical Reference Dashboard &bull; Designed for Interactive Learning
+    </footer>
+
+    <script>
+        const questions = [
+            {
+                category: "Preparation of the Patient (Pre-operative)",
+                question: "What is the primary goal regarding patient health status before an operation?",
+                options: [
+                    "Ensure the patient has lost weight",
+                    "Patient healthy at time of operation",
+                    "Complete all lab tests within 24 hours",
+                    "Stabilize blood pressure below 120/80"
+                ],
+                correct: 1,
+                explanation: "The primary objective prior to surgery is to ensure the patient is in optimal health status at the exact time of the operation."
+            },
+            {
+                category: "Preparation of the Patient (Pre-operative)",
+                question: "What action should be taken if a patient has a localized infection prior to surgery?",
+                options: [
+                    "Proceed with surgery immediately",
+                    "Cancel the surgery permanently",
+                    "Give treatment if infected",
+                    "Ignore it if it is small"
+                ],
+                correct: 2,
+                explanation: "Any existing localized infection must be treated prior to moving forward with the scheduled surgical procedure."
+            },
+            {
+                category: "Preparation of the Patient (Pre-operative)",
+                question: "When should pre-operative bathing be performed?",
+                options: [
+                    "Only right before entering the operating room",
+                    "Done the night before & the morning of surgery",
+                    "Exactly one week before surgery",
+                    "Only after the surgery is completed"
+                ],
+                correct: 1,
+                explanation: "Pre-operative bathing protocols specify washing both the night before and the morning of the surgery."
+            },
+            {
+                category: "Preparation of the Patient (Pre-operative)",
+                question: "When should pre-op shaving (refined) be conducted?",
+                options: [
+                    "Done close to time of surgery",
+                    "Done 3 days before surgery",
+                    "Done 2 weeks before surgery",
+                    "Shaving is strictly prohibited under all circumstances"
+                ],
+                correct: 0,
+                explanation: "If shaving is required, it should be done close to the time of surgery using refined techniques to avoid micro-abrasions."
+            },
+            {
+                category: "Preparation of the Patient (Pre-operative)",
+                question: "When should antibiotic prophylaxis be administered relative to the surgery?",
+                options: [
+                    "Exactly 2 hours before the initial incision",
+                    "30 min before initial incision",
+                    "Immediately after the incision is closed",
+                    "24 hours post-surgery"
+                ],
+                correct: 1,
+                explanation: "Antibiotic prophylaxis is optimally administered 30 minutes before the initial surgical incision."
+            },
+            {
+                category: "Preparation of the Patient (Pre-operative)",
+                question: "What is the recommended duration limit for antibiotic prophylaxis?",
+                options: [
+                    "Less than 12 hours",
+                    "Less than 24 hours",
+                    "Less than 48 hours",
+                    "Exactly 7 days"
+                ],
+                correct: 2,
+                explanation: "Prophylactic antibiotics are restricted to a short duration of less than 48 hours to minimize resistance."
+            },
+            {
+                category: "Operating Theatre Procedures (Intra-operative)",
+                question: "When should hand washing be performed in the operating theatre?",
+                options: [
+                    "Done immediately prior to surgery",
+                    "Done 1 hour before entering the theatre",
+                    "Only after the surgery concludes",
+                    "Every 30 minutes during the procedure"
+                ],
+                correct: 0,
+                explanation: "Surgical scrub and hand washing must be meticulously performed immediately prior to surgery."
+            },
+            {
+                category: "Operating Theatre Procedures (Intra-operative)",
+                question: "Which of the following substances are noted to persist on the skin during hand washing?",
+                options: [
+                    "Soap and water only",
+                    "Alcohol and hydrogen peroxide",
+                    "Chlorhexidine & povidone iodine",
+                    "Antibiotic ointment"
+                ],
+                correct: 2,
+                explanation: "Chlorhexidine and povidone iodine provide persistent antimicrobial activity on the skin."
+            },
+            {
+                category: "Operating Theatre Procedures (Intra-operative)",
+                question: "What type of filter is shown as part of the operating theatre ventilation system?",
+                options: [
+                    "Carbon filter",
+                    "HEPA filter",
+                    "UV filter",
+                    "Mesh filter"
+                ],
+                correct: 1,
+                explanation: "Operating theatres utilize HEPA filters in ventilation systems to capture airborne microbes and maintain sterility."
+            },
+            {
+                category: "Operating Theatre Procedures (Intra-operative)",
+                question: "What do \"squames\" refer to in the context of protective clothing?",
+                options: [
+                    "Sterile surgical instruments",
+                    "Dead skin epithelial cells",
+                    "Bacterial spores",
+                    "Protective gown fibers"
+                ],
+                correct: 1,
+                explanation: "Squames are shed dead skin epithelial cells that can harbor bacteria and contaminate the surgical field if not contained."
+            },
+            {
+                category: "Post-Operative Care",
+                question: "For how long is the sterile dressing typically left on as part of wound covering?",
+                options: [
+                    "12 h",
+                    "24 h",
+                    "48 h",
+                    "7 days"
+                ],
+                correct: 1,
+                explanation: "Initial sterile wound dressings are typically monitored and maintained for 24 hours."
+            },
+            {
+                category: "Post-Operative Care",
+                question: "Which of the following are listed as signs to look out for during wound assessment?",
+                options: [
+                    "Fever, pain, and excessive fluid",
+                    "Nausea, dizziness, and chills",
+                    "Itching, redness, and swelling only",
+                    "High blood pressure and fast pulse"
+                ],
+                correct: 0,
+                explanation: "Key warning indicators during wound assessments include fever, pain, and excessive fluid discharge."
+            },
+            {
+                category: "Post-Operative Care",
+                question: "What action must be taken before changing a wound dressing?",
+                options: [
+                    "Apply lotion to the hands",
+                    "Wash hands before changing dressing",
+                    "Put on sterile shoes",
+                    "Spray the room with antiseptic"
+                ],
+                correct: 1,
+                explanation: "Hand hygiene by washing hands is mandatory prior to handling or changing any wound dressings."
+            },
+            {
+                category: "Post-Operative Care",
+                question: "When is a wound drainage system inserted?",
+                options: [
+                    "In every routine surgery",
+                    "Only when a large amount of fluid is expected",
+                    "Only if an infection has already developed",
+                    "3 days after the operation"
+                ],
+                correct: 1,
+                explanation: "Wound drainage systems are selectively inserted only when large amounts of post-operative fluid collection are anticipated."
+            },
+            {
+                category: "Surveillance of Surgical Wound Infection (Continuous)",
+                question: "What type of rates are monitored continuously in the final phase?",
+                options: [
+                    "Patient recovery rates",
+                    "SWI (Surgical Wound Infection) rates",
+                    "Readmission rates",
+                    "Medication error rates"
+                ],
+                correct: 1,
+                explanation: "Continuous post-discharge surveillance tracks Surgical Wound Infection (SWI) rates over time."
+            },
+            {
+                category: "Surveillance of Surgical Wound Infection (Continuous)",
+                question: "To whom is the rate of SWI reported after monitoring?",
+                options: [
+                    "The hospital board of directors",
+                    "The patient directly",
+                    "To individual surgeon",
+                    "The local health department only"
+                ],
+                correct: 2,
+                explanation: "SWI monitoring data is analyzed and reported back to the individual surgeon for quality control and feedback."
+            },
+            {
+                category: "Surveillance of Surgical Wound Infection (Continuous)",
+                question: "Which visual tool is used to track SWI rates over time in the surveillance section?",
+                options: [
+                    "A pie chart",
+                    "A line graph",
+                    "A Venn diagram",
+                    "A flow chart"
+                ],
+                correct: 1,
+                explanation: "Line graphs are utilized to track fluctuation trends in infection rates continuously."
+            },
+            {
+                category: "General / Cross-Sectional",
+                question: "Which of the three main phases directly precedes \"Post-Operative Care\"?",
+                options: [
+                    "Preparation of the Patient",
+                    "Operating Theatre Procedures",
+                    "Surveillance of Surgical Wound Infection",
+                    "Patient Discharge Planning"
+                ],
+                correct: 1,
+                explanation: "The chronological sequence flows from Pre-operative Patient Preparation into Intra-operative Operating Theatre Procedures, followed by Post-operative Care."
+            },
+            {
+                category: "General / Cross-Sectional",
+                question: "Which micro-organism icon appears repeatedly across multiple sections of the infographic?",
+                options: [
+                    "Viruses",
+                    "Fungi",
+                    "Bacteria",
+                    "Parasites"
+                ],
+                correct: 2,
+                explanation: "Bacteria icons are systematically displayed across preparation, theatre air, wound care, and surveillance checkpoints."
+            },
+            {
+                category: "General / Cross-Sectional",
+                question: "What icon represents the reporting step in the surveillance section?",
+                options: [
+                    "A stethoscope",
+                    "A clipboard/document with a person's profile",
+                    "A computer monitor",
+                    "A telephone"
+                ],
+                correct: 1,
+                explanation: "A clipboard document representing case reports is shown being delivered to the medical staff."
+            }
+        ];
+
+        let currentIdx = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let isAnswered = new Array(questions.length).fill(false);
+
+        const startScreen = document.getElementById('start-screen');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsScreen = document.getElementById('results-screen');
+        const categoryTag = document.getElementById('category-tag');
+        const questionCounter = document.getElementById('question-counter');
+        const progressBar = document.getElementById('progress-bar');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const explanationBox = document.getElementById('explanation-box');
+        const explanationText = document.getElementById('explanation-text');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentIdx];
+            categoryTag.innerText = q.category;
+            questionCounter.innerText = `Question ${currentIdx + 1} of ${questions.length}`;
+            progressBar.style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
+            questionText.innerText = q.question;
+
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left p-4 rounded-xl border transition flex items-center justify-between text-sm md:text-base font-medium `;
+                
+                let btnStateClass = "border-slate-200 bg-white hover:bg-slate-50 text-slate-700";
+                
+                if (isAnswered[currentIdx]) {
+                    if (idx === q.correct) {
+                        btnStateClass = "border-emerald-500 bg-emerald-50 text-emerald-900 font-semibold";
+                    } else if (userAnswers[currentIdx] === idx) {
+                        btnStateClass = "border-rose-300 bg-rose-50 text-rose-900";
+                    } else {
+                        btnStateClass = "border-slate-200 bg-slate-50 opacity-60 text-slate-500";
+                    }
+                    btn.disabled = true;
+                }
+
+                btn.className += btnStateClass;
+                btn.innerHTML = `<span>${String.fromCharCode(65 + idx)}. ${opt}</span>`;
+                
+                if (!isAnswered[currentIdx]) {
+                    btn.onclick = () => selectOption(idx);
+                }
+
+                optionsContainer.appendChild(btn);
+            });
+
+            if (isAnswered[currentIdx]) {
+                explanationText.innerText = q.explanation;
+                explanationBox.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+            } else {
+                explanationBox.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+            }
+
+            prevBtn.disabled = currentIdx === 0;
+        }
+
+        function selectOption(selectedIdx) {
+            userAnswers[currentIdx] = selectedIdx;
+            isAnswered[currentIdx] = true;
+            loadQuestion();
+        }
+
+        function prevQuestion() {
+            if (currentIdx > 0) {
+                currentIdx--;
+                loadQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentIdx < questions.length - 1) {
+                currentIdx++;
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizContainer.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+
+            let score = 0;
+            questions.forEach((q, idx) => {
+                if (userAnswers[idx] === q.correct) score++;
+            });
+
+            document.getElementById('score-display').innerText = `${score}/${questions.length}`;
+            
+            let message = "";
+            const percentage = (score / questions.length) * 100;
+            if (percentage === 100) {
+                message = "Outstanding! You have a flawless understanding of surgical site infection prevention guidelines.";
+            } else if (percentage >= 80) {
+                message = "Great job! You have a strong grasp of pre-operative, intra-operative, and post-operative protocols.";
+            } else if (percentage >= 60) {
+                message = "Good effort! Review the infographic details to reinforce your knowledge in weaker areas.";
+            } else {
+                message = "Keep learning! Take some time to review the clinical infection control workflow and try again.";
+            }
+            document.getElementById('score-message').innerText = message;
+        }
+
+        function restartQuiz() {
+            currentIdx = 0;
+            userAnswers.fill(null);
+            isAnswered.fill(false);
+            resultsScreen.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function reviewAnswers() {
+            resultsScreen.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            currentIdx = 0;
+            loadQuestion();
+        }
+    </script>
+</body>
+</html>
